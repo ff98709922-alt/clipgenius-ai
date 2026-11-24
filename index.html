@@ -10,74 +10,41 @@
 
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#090d19;color:#f5f3ff;
- font-family:Arial,sans-serif
-}
-header{
- padding:19px 6%;display:flex;justify-content:space-between;
- align-items:center;background:#11182a;
- border-bottom:1px solid #29314a
-}
+body{margin:0;background:#090d19;color:#f5f3ff;font-family:Arial,sans-serif}
+header{padding:19px 6%;display:flex;justify-content:space-between;align-items:center;background:#11182a;border-bottom:1px solid #29314a}
 .logo{font-size:23px;font-weight:bold;color:#b69aff}
 .logo span{color:white}
 .navtag{font-size:11px;color:#a5a9c0}
 .hero{text-align:center;padding:48px 15px 30px}
-.pill{
- display:inline-block;padding:8px 14px;border-radius:30px;
- background:#211b3d;color:#c6b5ff;font-size:12px
-}
+.pill{display:inline-block;padding:8px 14px;border-radius:30px;background:#211b3d;color:#c6b5ff;font-size:12px}
 h1{font-size:clamp(30px,6vw,47px);margin:20px 0 12px}
 .highlight{color:#ad91ff}
 .subtitle{color:#9ca6bf;font-size:14px;line-height:1.7}
-.container{
- max-width:760px;margin:17px auto;padding:23px;
- background:#12192b;border:1px solid #29334f;
- border-radius:16px
-}
+.container{max-width:760px;margin:17px auto;padding:23px;background:#12192b;border:1px solid #29334f;border-radius:16px}
 .step{font-size:11px;color:#a991ff;font-weight:bold;letter-spacing:1px;margin-bottom:10px}
 h2{font-size:19px;margin:0 0 14px}
 .info{color:#a2abc2;font-size:13px;line-height:1.7}
-.upload{
- display:block;text-align:center;padding:32px 12px;
- background:#191a34;border:2px dashed #7460ba;
- border-radius:13px;cursor:pointer
-}
+.upload{display:block;text-align:center;padding:32px 12px;background:#191a34;border:2px dashed #7460ba;border-radius:13px;cursor:pointer}
 .upload-icon{font-size:34px;color:#b79aff}
 .upload h3{margin:12px 0 6px}
 input[type=file]{display:none}
-input[type=number],select{
- width:100%;padding:14px;margin-top:10px;
- background:#090f1e;color:white;
- border:1px solid #465170;border-radius:9px;font-size:15px
-}
-button{
- padding:13px 17px;background:#8668ef;color:white;
- border:0;border-radius:9px;font-size:14px;
- font-weight:bold;cursor:pointer
-}
+input[type=number],select{width:100%;padding:14px;margin-top:10px;background:#090f1e;color:white;border:1px solid #465170;border-radius:9px;font-size:15px}
+button{padding:13px 17px;background:#8668ef;color:white;border:0;border-radius:9px;font-size:14px;font-weight:bold;cursor:pointer}
 button:disabled{opacity:.45;cursor:not-allowed}
 .primary{width:100%;margin-top:17px}
 .secondary{background:#29334f}
 video{width:100%;margin-top:17px;border-radius:12px;background:#05070d}
 #details{overflow-wrap:anywhere}
-#status,#detectStatus{
- margin-top:15px;padding:13px;background:#1a2038;
- border-radius:9px;color:#c9baff;font-size:13px;line-height:1.6
-}
-.suggestion{
- padding:14px;margin-top:12px;border:1px solid #38425f;
- background:#192139;border-radius:11px
-}
+#status,#detectStatus{margin-top:15px;padding:13px;background:#1a2038;border-radius:9px;color:#c9baff;font-size:13px;line-height:1.6}
+.suggestion{padding:14px;margin-top:12px;border:1px solid #38425f;background:#192139;border-radius:11px}
 .suggestion label{display:flex;gap:10px;align-items:flex-start}
 .suggestion input{accent-color:#a58aff;width:18px;height:18px}
 .suggestion strong{font-size:14px}
 .suggestion p{margin:7px 0 0 28px}
-.download{
- display:block;padding:13px;margin-top:10px;
- background:#202b44;color:#d8caff;
- text-decoration:none;border-radius:9px;font-size:14px
-}
+.download{display:block;padding:13px;margin-top:10px;background:#202b44;color:#d8caff;text-decoration:none;border-radius:9px;font-size:14px}
+.progress-wrap{margin-top:14px;display:none}
+progress{width:100%;height:12px;accent-color:#a58aff}
+.progress-label{font-size:12px;color:#b9a9ee;margin-top:7px}
 .small{font-size:11px;color:#8894ae}
 footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 @media(max-width:600px){
@@ -87,7 +54,6 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -98,22 +64,18 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 <section class="hero">
  <div class="pill">✦ YOUR VIDEO WORKSPACE</div>
  <h1>Make Every Video<br><span class="highlight">Clip-Worthy.</span></h1>
- <p class="subtitle">
- Upload videos, discover scene changes and create shorter clips.
- </p>
+ <p class="subtitle">Upload videos, discover scene changes and create shorter clips.</p>
 </section>
 
 <div class="container">
  <div class="step">STEP 01</div>
  <h2>Upload your video</h2>
-
  <label class="upload" for="videoFile">
   <div class="upload-icon">⬆</div>
   <h3>Choose your video</h3>
   <p class="info">Select a video from your device</p>
   <button type="button">Select Video</button>
  </label>
-
  <input type="file" id="videoFile" accept="video/*">
  <video id="preview" controls hidden></video>
  <p id="details" class="info"></p>
@@ -122,15 +84,8 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 <div class="container">
  <div class="step">STEP 02</div>
  <h2>✦ Smart Clip Detection</h2>
- <p class="info">
- Find possible highlights by analysing visual changes
- between video scenes. No paid API required.
- </p>
-
- <button id="detectBtn" class="primary" disabled>
-  ✦ Find Highlights
- </button>
-
+ <p class="info">Find possible highlights by analysing visual changes between video scenes. No paid API required.</p>
+ <button id="detectBtn" class="primary" disabled>✦ Find Highlights</button>
  <div id="detectStatus">Upload a video to start detection.</div>
  <div id="suggestions"></div>
 </div>
@@ -138,34 +93,29 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 <div class="container">
  <div class="step">STEP 03</div>
  <h2>Manual Clip Settings</h2>
-
  <p class="info">Choose how long each clip should be.</p>
  <input id="clipDuration" type="number" min="5" max="300" value="30">
 
  <h2 style="margin-top:22px">Export Resolution</h2>
  <select id="resolution">
-  <option value="original">Original Quality</option>
+  <option value="original">Original Resolution</option>
   <option value="480">480p</option>
   <option value="720">720p HD</option>
   <option value="1080" selected>1080p Full HD</option>
  </select>
+ <p class="info">Higher resolutions require more processing. Original Resolution avoids resizing.</p>
 
- <p class="info">
- Higher resolutions take longer to process.
- Original Quality is recommended for faster processing.
- </p>
-
- <button id="process" class="primary" disabled>
-  Generate Manual Clips
- </button>
-
+ <button id="process" class="primary" disabled>Generate Manual Clips</button>
  <div id="status">Upload a video to get started.</div>
+
+ <div class="progress-wrap" id="progressWrap">
+  <progress id="exportProgress" max="100" value="0"></progress>
+  <div class="progress-label" id="progressLabel">Preparing export...</div>
+ </div>
  <div id="downloads"></div>
 </div>
 
-<footer>
- © 2026 ClipGenius AI · Built for Creators
-</footer>
+<footer>© 2026 ClipGenius AI · Built for Creators</footer>
 
 <script>
 const input=document.getElementById("videoFile");
@@ -177,12 +127,18 @@ const status=document.getElementById("status");
 const detectStatus=document.getElementById("detectStatus");
 const downloads=document.getElementById("downloads");
 const suggestions=document.getElementById("suggestions");
+const progressWrap=document.getElementById("progressWrap");
+const exportProgress=document.getElementById("exportProgress");
+const progressLabel=document.getElementById("progressLabel");
 
 let file=null;
 let duration=0;
 let videoURL=null;
 let ffmpeg=null;
 let detectedClips=[];
+let exporting=false;
+let currentClipIndex=0;
+let totalClips=0;
 
 function getClipDuration(){
  const value=Number(document.getElementById("clipDuration").value);
@@ -203,15 +159,16 @@ input.addEventListener("change",()=>{
 
  detectedClips=[];
  suggestions.innerHTML="";
- detectStatus.textContent="Ready for scene detection.";
  downloads.innerHTML="";
+ details.textContent="Loading video information...";
+ detectStatus.textContent="Ready for scene detection.";
+ status.textContent="Video uploaded. Ready to process.";
 
  preview.onloadedmetadata=()=>{
   duration=preview.duration;
   details.textContent="Selected: "+file.name+
    " | Duration: "+Math.floor(duration)+" seconds"+
    " | Resolution: "+preview.videoWidth+"x"+preview.videoHeight;
-
   processBtn.disabled=false;
   detectBtn.disabled=false;
  };
@@ -219,8 +176,25 @@ input.addEventListener("change",()=>{
 
 function seekVideo(time){
  return new Promise((resolve,reject)=>{
-  const done=()=>resolve();
-  const fail=()=>reject(new Error("Could not read video frame."));
+  if(Math.abs(preview.currentTime-time)<0.01){
+   resolve();
+   return;
+  }
+
+  let timer=setTimeout(()=>{
+   cleanup();
+   reject(new Error("Video frame reading timed out."));
+  },10000);
+
+  function cleanup(){
+   clearTimeout(timer);
+   preview.removeEventListener("seeked",done);
+   preview.removeEventListener("error",fail);
+  }
+
+  function done(){cleanup();resolve();}
+  function fail(){cleanup();reject(new Error("Could not read video frame."));}
+
   preview.addEventListener("seeked",done,{once:true});
   preview.addEventListener("error",fail,{once:true});
   preview.currentTime=time;
@@ -236,7 +210,6 @@ async function getFrame(time,canvas,context){
 function compareFrames(a,b){
  let difference=0;
  let samples=0;
-
  for(let i=0;i<a.length;i+=16){
   difference+=Math.abs(a[i]-b[i]);
   difference+=Math.abs(a[i+1]-b[i+1]);
@@ -248,23 +221,19 @@ function compareFrames(a,b){
 
 detectBtn.addEventListener("click",async()=>{
  if(!file||!duration)return;
-
  detectBtn.disabled=true;
  suggestions.innerHTML="";
  detectedClips=[];
 
  try{
   detectStatus.textContent="Analysing video scenes...";
-
   const canvas=document.createElement("canvas");
   canvas.width=96;
   canvas.height=54;
   const context=canvas.getContext("2d",{willReadFrequently:true});
-
   const step=Math.max(1.5,duration/150);
   let previous=null;
   let changes=[];
-
   const total=Math.floor(duration/step);
 
   for(let i=0;i<=total;i++){
@@ -277,14 +246,12 @@ detectBtn.addEventListener("click",async()=>{
      changes.push({time,score});
     }
    }
-
    previous=current;
-   detectStatus.textContent=
-    "Analysing scenes: "+Math.min(100,Math.round((i+1)/(total+1)*100))+"%";
+   detectStatus.textContent="Analysing scenes: "+
+    Math.min(100,Math.round((i+1)/(total+1)*100))+"%";
   }
 
   changes.sort((a,b)=>b.score-a.score);
-
   const clipLength=getClipDuration();
   const selected=[];
 
@@ -293,55 +260,38 @@ detectBtn.addEventListener("click",async()=>{
     duration-clipLength,
     change.time-clipLength*0.35
    ));
+   const end=Math.min(duration,start+clipLength);
+   if(end<=start)continue;
 
-   const end=start+clipLength;
-
-   const overlaps=selected.some(item=>
-    start<item.end&&end>item.start
-   );
-
-   if(!overlaps){
-    selected.push({
-     start,end,
-     score:change.score
-    });
-   }
-
+   const overlaps=selected.some(item=>start<item.end&&end>item.start);
+   if(!overlaps)selected.push({start,end,score:change.score});
    if(selected.length>=8)break;
   }
 
   detectedClips=selected.sort((a,b)=>a.start-b.start);
 
   if(!detectedClips.length){
-   detectStatus.textContent=
-    "No strong scene changes were found. Try another video or use manual clipping.";
+   detectStatus.textContent="No strong scene changes found. Try another video or use manual clipping.";
    return;
   }
 
-  detectStatus.textContent=
-   "Found "+detectedClips.length+" possible highlights. Select the clips you want.";
+  detectStatus.textContent="Found "+detectedClips.length+
+   " possible highlights. Select the clips you want.";
 
   detectedClips.forEach((clip,index)=>{
    const item=document.createElement("div");
    item.className="suggestion";
-
    const label=document.createElement("label");
    const checkbox=document.createElement("input");
    checkbox.type="checkbox";
    checkbox.checked=true;
    checkbox.dataset.index=index;
-
    const text=document.createElement("div");
-
    const title=document.createElement("strong");
    title.textContent="Suggested Highlight "+(index+1);
-
    const time=document.createElement("p");
    time.className="info";
-   time.textContent=
-    "Start: "+clip.start.toFixed(1)+"s · End: "+
-    clip.end.toFixed(1)+"s";
-
+   time.textContent="Start: "+clip.start.toFixed(1)+"s · End: "+clip.end.toFixed(1)+"s";
    text.append(title,time);
    label.append(checkbox,text);
    item.append(label);
@@ -363,48 +313,32 @@ detectBtn.addEventListener("click",async()=>{
 
 async function loadFFmpeg(){
  if(ffmpeg)return;
-
  status.textContent="Loading video processor...";
  const {createFFmpeg}=FFmpeg;
-
  ffmpeg=createFFmpeg({
   log:false,
   corePath:"https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
  });
-
  await ffmpeg.load();
 }
 
 async function exportHighlights(){
- const checked=[...suggestions.querySelectorAll(
-  'input[type="checkbox"]:checked'
- )];
-
+ const checked=[...suggestions.querySelectorAll('input[type="checkbox"]:checked')];
  if(!checked.length){
   detectStatus.textContent="Select at least one highlight.";
   return;
  }
-
- await createExports(checked.map(item=>
-  detectedClips[Number(item.dataset.index)]
- ),"highlight");
+ await createExports(checked.map(item=>detectedClips[Number(item.dataset.index)]),"highlight");
 }
 
 processBtn.addEventListener("click",async()=>{
  if(!file||!duration)return;
-
  try{
   const seconds=getClipDuration();
-  const count=Math.ceil(duration/seconds);
   const clips=[];
-
-  for(let i=0;i<count;i++){
-   clips.push({
-    start:i*seconds,
-    end:Math.min((i+1)*seconds,duration)
-   });
+  for(let i=0;i<Math.ceil(duration/seconds);i++){
+   clips.push({start:i*seconds,end:Math.min((i+1)*seconds,duration)});
   }
-
   await createExports(clips,"manual");
  }catch(error){
   status.textContent=error.message;
@@ -412,31 +346,33 @@ processBtn.addEventListener("click",async()=>{
 });
 
 async function createExports(clips,prefix){
- if(!file||!clips.length)return;
+ if(!file||!clips.length||exporting)return;
 
+ exporting=true;
  const resolution=document.getElementById("resolution").value;
  const buttons=[processBtn,detectBtn];
  buttons.forEach(button=>button.disabled=true);
  downloads.innerHTML="";
+ progressWrap.style.display="block";
+ exportProgress.value=0;
+ currentClipIndex=0;
+ totalClips=clips.length;
 
  let inputName="";
 
  try{
   await loadFFmpeg();
-
   status.textContent="Preparing video...";
 
   const ext=(file.name.split(".").pop()||"mp4")
    .toLowerCase().replace(/[^a-z0-9]/g,"");
-
   inputName="source."+ext;
 
   try{ffmpeg.FS("unlink",inputName);}catch(e){}
-
-  ffmpeg.FS("writeFile",inputName,
-   new Uint8Array(await file.arrayBuffer()));
+  ffmpeg.FS("writeFile",inputName,new Uint8Array(await file.arrayBuffer()));
 
   for(let i=0;i<clips.length;i++){
+   currentClipIndex=i;
    const clip=clips[i];
    const output=prefix+"_"+(i+1)+".mp4";
    const length=clip.end-clip.start;
@@ -444,6 +380,7 @@ async function createExports(clips,prefix){
    try{ffmpeg.FS("unlink",output);}catch(e){}
 
    status.textContent="Creating clip "+(i+1)+" of "+clips.length+"...";
+   progressLabel.textContent="Clip "+(i+1)+" of "+clips.length+" · Starting...";
 
    const args=[
     "-y",
@@ -454,9 +391,15 @@ async function createExports(clips,prefix){
 
    if(resolution!=="original"){
     const height=Number(resolution);
-    const filter=preview.videoWidth>=preview.videoHeight
-     ?"scale=-2:"+height
-     :"scale="+height+":-2";
+    const landscape=preview.videoWidth>=preview.videoHeight;
+
+    const maxWidth=landscape?height*2:height;
+    const maxHeight=landscape?height:height*2;
+
+    const filter=
+     "scale=w='min(iw,"+maxWidth+")':h='min(ih,"+maxHeight+")'"+
+     ":force_original_aspect_ratio=decrease:force_divisible_by=2:flags=fast_bilinear";
+
     args.push("-vf",filter);
    }
 
@@ -471,6 +414,14 @@ async function createExports(clips,prefix){
     output
    );
 
+   ffmpeg.setProgress(({ratio})=>{
+    if(!Number.isFinite(ratio))return;
+    const clipPercent=Math.max(0,Math.min(100,ratio*100));
+    const overall=((i+clipPercent/100)/clips.length)*100;
+    exportProgress.value=overall;
+    progressLabel.textContent="Exporting: "+Math.round(overall)+"% · Clip "+(i+1)+" of "+clips.length;
+   });
+
    await ffmpeg.run(...args);
 
    const data=ffmpeg.FS("readFile",output);
@@ -482,24 +433,27 @@ async function createExports(clips,prefix){
    link.download=output;
    link.className="download";
    link.textContent="⬇ Download "+prefix+" "+(i+1);
-
    downloads.appendChild(link);
+
    ffmpeg.FS("unlink",output);
+   exportProgress.value=((i+1)/clips.length)*100;
   }
 
   status.textContent="Success! "+clips.length+" clips created.";
+  progressLabel.textContent="Export complete · 100%";
 
  }catch(error){
   console.error(error);
   status.textContent="Processing failed: "+error.message;
+  progressLabel.textContent="Export stopped. Please try again.";
  }finally{
   if(inputName&&ffmpeg){
    try{ffmpeg.FS("unlink",inputName);}catch(e){}
   }
   buttons.forEach(button=>button.disabled=false);
+  exporting=false;
  }
 }
 </script>
-
 </body>
 </html>
