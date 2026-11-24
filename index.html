@@ -17,7 +17,7 @@ h1{font-size:34px}
 .container{max-width:700px;margin:15px auto;padding:22px;background:#151c2d;border:1px solid #303b54;border-radius:16px}
 .upload{display:block;text-align:center;padding:35px 12px;border:2px dashed #8170d9;border-radius:13px;cursor:pointer}
 input[type=file]{display:none}
-input[type=number]{padding:12px;width:100%;background:#090d18;color:white;border:1px solid #53607c;border-radius:8px;margin-top:10px}
+input[type=number],select{padding:12px;width:100%;background:#090d18;color:white;border:1px solid #53607c;border-radius:8px;margin-top:10px}
 button{padding:13px 18px;background:#8164ed;color:white;border:0;border-radius:8px;font-size:15px;cursor:pointer}
 button:disabled{opacity:.5}
 video{width:100%;margin-top:18px;border-radius:10px}
@@ -28,6 +28,7 @@ footer{text-align:center;padding:30px;color:#8490a8}
 </style>
 </head>
 <body>
+
 <header><div class="logo">✦ ClipGenius AI</div></header>
 
 <section class="hero">
@@ -52,7 +53,19 @@ footer{text-align:center;padding:30px;color:#8490a8}
 <h2>2. Choose clip duration</h2>
 <p class="info">How long should each clip be?</p>
 <input id="clipDuration" type="number" min="5" max="300" value="30">
-<p class="info">Duration in seconds. The final clip may be shorter.</p>
+
+<h2>3. Choose video resolution</h2>
+<p class="info">Select the resolution for your exported clips.</p>
+
+<select id="resolution">
+<option value="original">Original Quality</option>
+<option value="480">480p</option>
+<option value="720">720p HD</option>
+<option value="1080">1080p Full HD</option>
+</select>
+
+<p class="info">Higher resolutions may take longer to process.</p>
+
 <button id="process" disabled>Generate Clips</button>
 <div id="status">Select a video to begin.</div>
 <div id="downloads"></div>
@@ -76,14 +89,18 @@ let ffmpeg=null;
 input.addEventListener("change",()=>{
  file=input.files[0];
  if(!file)return;
+
  if(videoURL)URL.revokeObjectURL(videoURL);
+
  videoURL=URL.createObjectURL(file);
  preview.src=videoURL;
  preview.hidden=false;
+
  preview.onloadedmetadata=()=>{
   duration=preview.duration;
   details.textContent="Selected: "+file.name+
-   " | Duration: "+Math.floor(duration)+" seconds";
+   " | Duration: "+Math.floor(duration)+" seconds"+
+   " | Original: "+preview.videoWidth+"x"+preview.videoHeight;
   processBtn.disabled=false;
  };
 });
@@ -92,6 +109,8 @@ processBtn.addEventListener("click",async()=>{
  if(!file || !duration)return;
 
  const seconds=Number(document.getElementById("clipDuration").value);
+ const resolution=document.getElementById("resolution").value;
+
  if(!Number.isFinite(seconds)||seconds<5||seconds>300){
   status.textContent="Choose a duration between 5 and 300 seconds.";
   return;
@@ -99,6 +118,8 @@ processBtn.addEventListener("click",async()=>{
 
  processBtn.disabled=true;
  downloads.innerHTML="";
+
+ let inputName="";
 
  try{
   status.textContent="Loading video processor...";
@@ -115,8 +136,12 @@ processBtn.addEventListener("click",async()=>{
   status.textContent="Preparing your video...";
 
   const ext=(file.name.split(".").pop()||"mp4")
-    .toLowerCase().replace(/[^a-z0-9]/g,"");
-  const inputName="source."+ext;
+   .toLowerCase().replace(/[^a-z0-9]/g,"");
+
+  inputName="source."+ext;
+
+  try{ffmpeg.FS("unlink",inputName);}catch(e){}
+
   ffmpeg.FS("writeFile",inputName,
    new Uint8Array(await file.arrayBuffer()));
 
@@ -127,23 +152,43 @@ processBtn.addEventListener("click",async()=>{
    const length=Math.min(seconds,duration-start);
    const output="clip_"+(i+1)+".mp4";
 
-   status.textContent="Creating clip "+(i+1)+" of "+count+"...";
+   try{ffmpeg.FS("unlink",output);}catch(e){}
 
-   await ffmpeg.run(
+   status.textContent="Creating clip "+(i+1)+" of "+count+
+    " at "+resolution+"...";
+
+   const args=[
+    "-y",
     "-ss",String(start),
     "-i",inputName,
-    "-t",String(length),
+    "-t",String(length)
+   ];
+
+   if(resolution!=="original"){
+    const height=Number(resolution);
+
+    const filter=preview.videoWidth>=preview.videoHeight
+     ? "scale=-2:"+height
+     : "scale="+height+":-2";
+
+    args.push("-vf",filter);
+   }
+
+   args.push(
     "-c:v","libx264",
-    "-preset","ultrafast",
-    "-crf","28",
+    "-preset","fast",
+    "-crf","20",
+    "-pix_fmt","yuv420p",
     "-c:a","aac",
-    "-b:a","128k",
+    "-b:a","192k",
     "-movflags","+faststart",
     output
    );
 
+   await ffmpeg.run(...args);
+
    const data=ffmpeg.FS("readFile",output);
-   const blob=new Blob([data.buffer],{type:"video/mp4"});
+   const blob=new Blob([data],{type:"video/mp4"});
    const url=URL.createObjectURL(blob);
 
    const link=document.createElement("a");
@@ -152,15 +197,21 @@ processBtn.addEventListener("click",async()=>{
    link.className="download";
    link.textContent="⬇ Download Clip "+(i+1);
    downloads.appendChild(link);
+
+   ffmpeg.FS("unlink",output);
   }
 
-  status.textContent="Success! "+count+" clips created.";
-  ffmpeg.FS("unlink",inputName);
+  status.textContent="Success! "+count+
+   " clips created at "+resolution+" resolution.";
 
  }catch(error){
   console.error(error);
-  status.textContent="Processing failed. Try a smaller video or another browser. Details: "+error.message;
+  status.textContent="Processing failed. Try a smaller video. Details: "+
+   error.message;
  }finally{
+  if(inputName && ffmpeg){
+   try{ffmpeg.FS("unlink",inputName);}catch(e){}
+  }
   processBtn.disabled=false;
  }
 });
