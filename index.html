@@ -4,70 +4,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ClipGenius AI</title>
+<meta name="theme-color" content="#080b16">
+<title>ClipGenius AI — Video Clipper</title>
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090d18;color:white;font-family:Arial,sans-serif}
-header{padding:22px;background:#151c2d;border-bottom:1px solid #303b54}
-.logo{font-size:24px;font-weight:bold;color:#a48aff}
-.hero{text-align:center;padding:35px 15px}
-h1{font-size:32px}
-.highlight{color:#a48aff}
-.container{max-width:700px;margin:15px auto;padding:22px;background:#151c2d;border:1px solid #303b54;border-radius:16px}
-.upload{display:block;text-align:center;padding:30px 12px;border:2px dashed #8170d9;border-radius:13px;cursor:pointer}
+body{
+ margin:0;background:#080b16;color:#f4f3ff;
+ font-family:Arial,sans-serif;
+}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:20px 6%;border-bottom:1px solid #242942;
+ background:#101427;
+}
+.logo{font-size:23px;font-weight:800;color:#b49aff}
+.logo span{color:white}
+.tag{font-size:12px;color:#9b91bb}
+.hero{text-align:center;padding:55px 18px 35px}
+.tagline{
+ display:inline-block;padding:8px 14px;border-radius:30px;
+ background:#211b3d;color:#c6b3ff;font-size:12px;
+}
+h1{font-size:clamp(30px,6vw,48px);margin:20px 0 12px}
+.highlight{color:#ad91ff}
+.subtitle{color:#9ca5bd;line-height:1.7;font-size:15px}
+.container{
+ max-width:760px;margin:18px auto;padding:25px;
+ background:#11172a;border:1px solid #29314c;
+ border-radius:17px;
+}
+h2{font-size:19px;margin-top:0}
+.step{
+ color:#a98aff;font-size:12px;font-weight:bold;
+ letter-spacing:1px;margin-bottom:10px;
+}
+.upload{
+ display:block;text-align:center;padding:35px 15px;
+ border:2px dashed #6554a6;border-radius:14px;
+ background:#17172e;cursor:pointer;
+}
+.upload-icon{font-size:35px;color:#b39aff}
+.upload h3{margin:12px 0 5px}
+.info{color:#9ca6bf;font-size:13px;line-height:1.7}
 input[type=file]{display:none}
-input[type=number],select{padding:12px;width:100%;background:#090d18;color:white;border:1px solid #53607c;border-radius:8px;margin-top:10px}
-button{padding:13px 18px;background:#8164ed;color:white;border:0;border-radius:8px;font-size:15px;cursor:pointer}
-button:disabled{opacity:.5}
-video{width:100%;margin-top:18px;border-radius:10px}
-.info{color:#b2bad0;font-size:14px;line-height:1.6}
-#status{margin-top:18px;color:#b9a8ff}
-.download{display:block;margin:10px 0;padding:13px;background:#202b40;border-radius:9px;color:#c8baff;text-decoration:none}
-footer{text-align:center;padding:30px;color:#8490a8}
+input[type=number],select{
+ width:100%;padding:14px;margin-top:10px;
+ background:#090e1d;color:white;
+ border:1px solid #3a4563;border-radius:9px;
+ font-size:15px;
+}
+button{
+ padding:14px 20px;background:#8768f3;color:white;
+ border:0;border-radius:9px;font-size:15px;
+ font-weight:bold;cursor:pointer;
+}
+button:disabled{opacity:.45;cursor:not-allowed}
+#process{width:100%;margin-top:22px}
+video{
+ width:100%;margin-top:18px;border-radius:12px;
+ background:#05070e;
+}
+#details{margin-top:12px;overflow-wrap:anywhere}
+#status{
+ margin-top:18px;padding:13px;
+ border-radius:9px;background:#191b34;
+ color:#c5b5ff;font-size:14px;line-height:1.5;
+}
+.download{
+ display:block;margin-top:12px;padding:14px;
+ background:#202944;border:1px solid #394365;
+ border-radius:9px;color:#d4c7ff;
+ text-decoration:none;font-size:14px;
+}
+.download:active{background:#303c60}
+.footer{
+ text-align:center;padding:35px 15px;
+ color:#77819b;font-size:12px;
+}
+@media(max-width:600px){
+ header{padding:17px 5%}
+ .container{margin:14px 12px;padding:19px}
+ .hero{padding:42px 14px 25px}
+}
 </style>
 </head>
 <body>
-<header><div class="logo">✦ ClipGenius AI</div></header>
+
+<header>
+ <div class="logo">✦ ClipGenius <span>AI</span></div>
+ <div class="tag">VIDEO CREATOR STUDIO</div>
+</header>
 
 <section class="hero">
-<h1>Turn Long Videos Into <span class="highlight">Short Clips</span></h1>
-<p class="info">Create shorter videos with adjustable export quality.</p>
+ <div class="tagline">✦ YOUR AI VIDEO WORKSPACE</div>
+ <h1>Long Videos.<br><span class="highlight">Shorter Stories.</span></h1>
+ <p class="subtitle">
+ Turn your long videos into downloadable clips.<br>
+ Simple video clipping, right in your browser.
+ </p>
 </section>
 
 <div class="container">
-<h2>1. Upload your video</h2>
-<label class="upload" for="videoFile">
-⬆
-<h3>Choose your video</h3>
-<p class="info">Select an MP4 or other supported video</p>
-<button type="button">Select Video</button>
-</label>
-<input type="file" id="videoFile" accept="video/*">
-<video id="preview" controls hidden></video>
-<p id="details" class="info"></p>
+ <div class="step">STEP 01</div>
+ <h2>Upload your video</h2>
+
+ <label class="upload" for="videoFile">
+  <div class="upload-icon">⬆</div>
+  <h3>Choose your video</h3>
+  <p class="info">Tap below to select a video from your device</p>
+  <button type="button">Select Video</button>
+ </label>
+
+ <input type="file" id="videoFile" accept="video/*">
+ <video id="preview" controls hidden></video>
+ <p id="details" class="info"></p>
 </div>
 
 <div class="container">
-<h2>2. Choose clip duration</h2>
-<p class="info">How long should each clip be?</p>
-<input id="clipDuration" type="number" min="5" max="300" value="30">
+ <div class="step">STEP 02</div>
+ <h2>Customize your clips</h2>
 
-<h2>3. Choose video resolution</h2>
-<select id="resolution">
-<option value="original">Original Quality</option>
-<option value="480">480p</option>
-<option value="720">720p HD</option>
-<option value="1080" selected>1080p Full HD</option>
-</select>
-<p class="info">Higher resolutions may take longer to process.</p>
+ <p class="info">Choose how long each clip should be.</p>
+ <input id="clipDuration" type="number"
+ min="5" max="300" value="30">
 
-<button id="process" disabled>Generate Clips</button>
-<div id="status">Select a video to begin.</div>
-<div id="downloads"></div>
+ <div style="height:22px"></div>
+
+ <div class="step">STEP 03</div>
+ <h2>Export resolution</h2>
+
+ <select id="resolution">
+  <option value="original">Original Quality</option>
+  <option value="480">480p</option>
+  <option value="720">720p HD</option>
+  <option value="1080" selected>1080p Full HD</option>
+ </select>
+
+ <p class="info">
+ Higher resolutions may take longer to process.
+ Original Quality is recommended for faster processing.
+ </p>
+
+ <button id="process" disabled>✦ Generate Clips</button>
+
+ <div id="status">Upload a video to get started.</div>
+ <div id="downloads"></div>
 </div>
 
-<footer>© 2026 ClipGenius AI · Built for Creators</footer>
+<footer class="footer">
+ © 2026 ClipGenius AI · Built for Creators
+</footer>
 
 <script>
 const input=document.getElementById("videoFile");
