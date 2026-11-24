@@ -4,104 +4,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#080b16">
-<title>ClipGenius AI — Video Clipper</title>
+<meta name="theme-color" content="#090d19">
+<title>ClipGenius AI</title>
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;background:#080b16;color:#f4f3ff;
- font-family:Arial,sans-serif;
+ margin:0;background:#090d19;color:#f5f3ff;
+ font-family:Arial,sans-serif
 }
 header{
- display:flex;justify-content:space-between;align-items:center;
- padding:20px 6%;border-bottom:1px solid #242942;
- background:#101427;
+ padding:19px 6%;display:flex;justify-content:space-between;
+ align-items:center;background:#11182a;
+ border-bottom:1px solid #29314a
 }
-.logo{font-size:23px;font-weight:800;color:#b49aff}
+.logo{font-size:23px;font-weight:bold;color:#b69aff}
 .logo span{color:white}
-.tag{font-size:12px;color:#9b91bb}
-.hero{text-align:center;padding:55px 18px 35px}
-.tagline{
+.navtag{font-size:11px;color:#a5a9c0}
+.hero{text-align:center;padding:48px 15px 30px}
+.pill{
  display:inline-block;padding:8px 14px;border-radius:30px;
- background:#211b3d;color:#c6b3ff;font-size:12px;
+ background:#211b3d;color:#c6b5ff;font-size:12px
 }
-h1{font-size:clamp(30px,6vw,48px);margin:20px 0 12px}
+h1{font-size:clamp(30px,6vw,47px);margin:20px 0 12px}
 .highlight{color:#ad91ff}
-.subtitle{color:#9ca5bd;line-height:1.7;font-size:15px}
+.subtitle{color:#9ca6bf;font-size:14px;line-height:1.7}
 .container{
- max-width:760px;margin:18px auto;padding:25px;
- background:#11172a;border:1px solid #29314c;
- border-radius:17px;
+ max-width:760px;margin:17px auto;padding:23px;
+ background:#12192b;border:1px solid #29334f;
+ border-radius:16px
 }
-h2{font-size:19px;margin-top:0}
-.step{
- color:#a98aff;font-size:12px;font-weight:bold;
- letter-spacing:1px;margin-bottom:10px;
-}
+.step{font-size:11px;color:#a991ff;font-weight:bold;letter-spacing:1px;margin-bottom:10px}
+h2{font-size:19px;margin:0 0 14px}
+.info{color:#a2abc2;font-size:13px;line-height:1.7}
 .upload{
- display:block;text-align:center;padding:35px 15px;
- border:2px dashed #6554a6;border-radius:14px;
- background:#17172e;cursor:pointer;
+ display:block;text-align:center;padding:32px 12px;
+ background:#191a34;border:2px dashed #7460ba;
+ border-radius:13px;cursor:pointer
 }
-.upload-icon{font-size:35px;color:#b39aff}
-.upload h3{margin:12px 0 5px}
-.info{color:#9ca6bf;font-size:13px;line-height:1.7}
+.upload-icon{font-size:34px;color:#b79aff}
+.upload h3{margin:12px 0 6px}
 input[type=file]{display:none}
 input[type=number],select{
  width:100%;padding:14px;margin-top:10px;
- background:#090e1d;color:white;
- border:1px solid #3a4563;border-radius:9px;
- font-size:15px;
+ background:#090f1e;color:white;
+ border:1px solid #465170;border-radius:9px;font-size:15px
 }
 button{
- padding:14px 20px;background:#8768f3;color:white;
- border:0;border-radius:9px;font-size:15px;
- font-weight:bold;cursor:pointer;
+ padding:13px 17px;background:#8668ef;color:white;
+ border:0;border-radius:9px;font-size:14px;
+ font-weight:bold;cursor:pointer
 }
 button:disabled{opacity:.45;cursor:not-allowed}
-#process{width:100%;margin-top:22px}
-video{
- width:100%;margin-top:18px;border-radius:12px;
- background:#05070e;
+.primary{width:100%;margin-top:17px}
+.secondary{background:#29334f}
+video{width:100%;margin-top:17px;border-radius:12px;background:#05070d}
+#details{overflow-wrap:anywhere}
+#status,#detectStatus{
+ margin-top:15px;padding:13px;background:#1a2038;
+ border-radius:9px;color:#c9baff;font-size:13px;line-height:1.6
 }
-#details{margin-top:12px;overflow-wrap:anywhere}
-#status{
- margin-top:18px;padding:13px;
- border-radius:9px;background:#191b34;
- color:#c5b5ff;font-size:14px;line-height:1.5;
+.suggestion{
+ padding:14px;margin-top:12px;border:1px solid #38425f;
+ background:#192139;border-radius:11px
 }
+.suggestion label{display:flex;gap:10px;align-items:flex-start}
+.suggestion input{accent-color:#a58aff;width:18px;height:18px}
+.suggestion strong{font-size:14px}
+.suggestion p{margin:7px 0 0 28px}
 .download{
- display:block;margin-top:12px;padding:14px;
- background:#202944;border:1px solid #394365;
- border-radius:9px;color:#d4c7ff;
- text-decoration:none;font-size:14px;
+ display:block;padding:13px;margin-top:10px;
+ background:#202b44;color:#d8caff;
+ text-decoration:none;border-radius:9px;font-size:14px
 }
-.download:active{background:#303c60}
-.footer{
- text-align:center;padding:35px 15px;
- color:#77819b;font-size:12px;
-}
+.small{font-size:11px;color:#8894ae}
+footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 @media(max-width:600px){
  header{padding:17px 5%}
- .container{margin:14px 12px;padding:19px}
- .hero{padding:42px 14px 25px}
+ .container{margin:13px 11px;padding:19px}
+ .hero{padding:40px 12px 25px}
 }
 </style>
 </head>
+
 <body>
 
 <header>
  <div class="logo">✦ ClipGenius <span>AI</span></div>
- <div class="tag">VIDEO CREATOR STUDIO</div>
+ <div class="navtag">CREATOR STUDIO</div>
 </header>
 
 <section class="hero">
- <div class="tagline">✦ YOUR AI VIDEO WORKSPACE</div>
- <h1>Long Videos.<br><span class="highlight">Shorter Stories.</span></h1>
+ <div class="pill">✦ YOUR VIDEO WORKSPACE</div>
+ <h1>Make Every Video<br><span class="highlight">Clip-Worthy.</span></h1>
  <p class="subtitle">
- Turn your long videos into downloadable clips.<br>
- Simple video clipping, right in your browser.
+ Upload videos, discover scene changes and create shorter clips.
  </p>
 </section>
 
@@ -112,7 +110,7 @@ video{
  <label class="upload" for="videoFile">
   <div class="upload-icon">⬆</div>
   <h3>Choose your video</h3>
-  <p class="info">Tap below to select a video from your device</p>
+  <p class="info">Select a video from your device</p>
   <button type="button">Select Video</button>
  </label>
 
@@ -123,17 +121,28 @@ video{
 
 <div class="container">
  <div class="step">STEP 02</div>
- <h2>Customize your clips</h2>
+ <h2>✦ Smart Clip Detection</h2>
+ <p class="info">
+ Find possible highlights by analysing visual changes
+ between video scenes. No paid API required.
+ </p>
+
+ <button id="detectBtn" class="primary" disabled>
+  ✦ Find Highlights
+ </button>
+
+ <div id="detectStatus">Upload a video to start detection.</div>
+ <div id="suggestions"></div>
+</div>
+
+<div class="container">
+ <div class="step">STEP 03</div>
+ <h2>Manual Clip Settings</h2>
 
  <p class="info">Choose how long each clip should be.</p>
- <input id="clipDuration" type="number"
- min="5" max="300" value="30">
+ <input id="clipDuration" type="number" min="5" max="300" value="30">
 
- <div style="height:22px"></div>
-
- <div class="step">STEP 03</div>
- <h2>Export resolution</h2>
-
+ <h2 style="margin-top:22px">Export Resolution</h2>
  <select id="resolution">
   <option value="original">Original Quality</option>
   <option value="480">480p</option>
@@ -142,17 +151,19 @@ video{
  </select>
 
  <p class="info">
- Higher resolutions may take longer to process.
+ Higher resolutions take longer to process.
  Original Quality is recommended for faster processing.
  </p>
 
- <button id="process" disabled>✦ Generate Clips</button>
+ <button id="process" class="primary" disabled>
+  Generate Manual Clips
+ </button>
 
  <div id="status">Upload a video to get started.</div>
  <div id="downloads"></div>
 </div>
 
-<footer class="footer">
+<footer>
  © 2026 ClipGenius AI · Built for Creators
 </footer>
 
@@ -161,13 +172,25 @@ const input=document.getElementById("videoFile");
 const preview=document.getElementById("preview");
 const details=document.getElementById("details");
 const processBtn=document.getElementById("process");
+const detectBtn=document.getElementById("detectBtn");
 const status=document.getElementById("status");
+const detectStatus=document.getElementById("detectStatus");
 const downloads=document.getElementById("downloads");
+const suggestions=document.getElementById("suggestions");
 
 let file=null;
 let duration=0;
 let videoURL=null;
 let ffmpeg=null;
+let detectedClips=[];
+
+function getClipDuration(){
+ const value=Number(document.getElementById("clipDuration").value);
+ if(!Number.isFinite(value)||value<5||value>300){
+  throw new Error("Choose a clip duration between 5 and 300 seconds.");
+ }
+ return value;
+}
 
 input.addEventListener("change",()=>{
  file=input.files[0];
@@ -178,46 +201,234 @@ input.addEventListener("change",()=>{
  preview.src=videoURL;
  preview.hidden=false;
 
+ detectedClips=[];
+ suggestions.innerHTML="";
+ detectStatus.textContent="Ready for scene detection.";
+ downloads.innerHTML="";
+
  preview.onloadedmetadata=()=>{
   duration=preview.duration;
   details.textContent="Selected: "+file.name+
    " | Duration: "+Math.floor(duration)+" seconds"+
-   " | Original: "+preview.videoWidth+"x"+preview.videoHeight;
+   " | Resolution: "+preview.videoWidth+"x"+preview.videoHeight;
+
   processBtn.disabled=false;
+  detectBtn.disabled=false;
  };
 });
+
+function seekVideo(time){
+ return new Promise((resolve,reject)=>{
+  const done=()=>resolve();
+  const fail=()=>reject(new Error("Could not read video frame."));
+  preview.addEventListener("seeked",done,{once:true});
+  preview.addEventListener("error",fail,{once:true});
+  preview.currentTime=time;
+ });
+}
+
+async function getFrame(time,canvas,context){
+ await seekVideo(time);
+ context.drawImage(preview,0,0,canvas.width,canvas.height);
+ return context.getImageData(0,0,canvas.width,canvas.height).data;
+}
+
+function compareFrames(a,b){
+ let difference=0;
+ let samples=0;
+
+ for(let i=0;i<a.length;i+=16){
+  difference+=Math.abs(a[i]-b[i]);
+  difference+=Math.abs(a[i+1]-b[i+1]);
+  difference+=Math.abs(a[i+2]-b[i+2]);
+  samples+=3;
+ }
+ return difference/(samples||1);
+}
+
+detectBtn.addEventListener("click",async()=>{
+ if(!file||!duration)return;
+
+ detectBtn.disabled=true;
+ suggestions.innerHTML="";
+ detectedClips=[];
+
+ try{
+  detectStatus.textContent="Analysing video scenes...";
+
+  const canvas=document.createElement("canvas");
+  canvas.width=96;
+  canvas.height=54;
+  const context=canvas.getContext("2d",{willReadFrequently:true});
+
+  const step=Math.max(1.5,duration/150);
+  let previous=null;
+  let changes=[];
+
+  const total=Math.floor(duration/step);
+
+  for(let i=0;i<=total;i++){
+   const time=Math.min(i*step,duration-0.1);
+   const current=await getFrame(time,canvas,context);
+
+   if(previous){
+    const score=compareFrames(previous,current);
+    if(score>22&&time>2&&time<duration-2){
+     changes.push({time,score});
+    }
+   }
+
+   previous=current;
+   detectStatus.textContent=
+    "Analysing scenes: "+Math.min(100,Math.round((i+1)/(total+1)*100))+"%";
+  }
+
+  changes.sort((a,b)=>b.score-a.score);
+
+  const clipLength=getClipDuration();
+  const selected=[];
+
+  for(const change of changes){
+   const start=Math.max(0,Math.min(
+    duration-clipLength,
+    change.time-clipLength*0.35
+   ));
+
+   const end=start+clipLength;
+
+   const overlaps=selected.some(item=>
+    start<item.end&&end>item.start
+   );
+
+   if(!overlaps){
+    selected.push({
+     start,end,
+     score:change.score
+    });
+   }
+
+   if(selected.length>=8)break;
+  }
+
+  detectedClips=selected.sort((a,b)=>a.start-b.start);
+
+  if(!detectedClips.length){
+   detectStatus.textContent=
+    "No strong scene changes were found. Try another video or use manual clipping.";
+   return;
+  }
+
+  detectStatus.textContent=
+   "Found "+detectedClips.length+" possible highlights. Select the clips you want.";
+
+  detectedClips.forEach((clip,index)=>{
+   const item=document.createElement("div");
+   item.className="suggestion";
+
+   const label=document.createElement("label");
+   const checkbox=document.createElement("input");
+   checkbox.type="checkbox";
+   checkbox.checked=true;
+   checkbox.dataset.index=index;
+
+   const text=document.createElement("div");
+
+   const title=document.createElement("strong");
+   title.textContent="Suggested Highlight "+(index+1);
+
+   const time=document.createElement("p");
+   time.className="info";
+   time.textContent=
+    "Start: "+clip.start.toFixed(1)+"s · End: "+
+    clip.end.toFixed(1)+"s";
+
+   text.append(title,time);
+   label.append(checkbox,text);
+   item.append(label);
+   suggestions.appendChild(item);
+  });
+
+  const exportButton=document.createElement("button");
+  exportButton.className="primary";
+  exportButton.textContent="Export Selected Highlights";
+  exportButton.addEventListener("click",exportHighlights);
+  suggestions.appendChild(exportButton);
+
+ }catch(error){
+  detectStatus.textContent="Detection failed: "+error.message;
+ }finally{
+  detectBtn.disabled=false;
+ }
+});
+
+async function loadFFmpeg(){
+ if(ffmpeg)return;
+
+ status.textContent="Loading video processor...";
+ const {createFFmpeg}=FFmpeg;
+
+ ffmpeg=createFFmpeg({
+  log:false,
+  corePath:"https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
+ });
+
+ await ffmpeg.load();
+}
+
+async function exportHighlights(){
+ const checked=[...suggestions.querySelectorAll(
+  'input[type="checkbox"]:checked'
+ )];
+
+ if(!checked.length){
+  detectStatus.textContent="Select at least one highlight.";
+  return;
+ }
+
+ await createExports(checked.map(item=>
+  detectedClips[Number(item.dataset.index)]
+ ),"highlight");
+}
 
 processBtn.addEventListener("click",async()=>{
  if(!file||!duration)return;
 
- const seconds=Number(document.getElementById("clipDuration").value);
- const resolution=document.getElementById("resolution").value;
+ try{
+  const seconds=getClipDuration();
+  const count=Math.ceil(duration/seconds);
+  const clips=[];
 
- if(!Number.isFinite(seconds)||seconds<5||seconds>300){
-  status.textContent="Choose a duration between 5 and 300 seconds.";
-  return;
+  for(let i=0;i<count;i++){
+   clips.push({
+    start:i*seconds,
+    end:Math.min((i+1)*seconds,duration)
+   });
+  }
+
+  await createExports(clips,"manual");
+ }catch(error){
+  status.textContent=error.message;
  }
+});
 
- processBtn.disabled=true;
+async function createExports(clips,prefix){
+ if(!file||!clips.length)return;
+
+ const resolution=document.getElementById("resolution").value;
+ const buttons=[processBtn,detectBtn];
+ buttons.forEach(button=>button.disabled=true);
  downloads.innerHTML="";
+
  let inputName="";
 
  try{
-  status.textContent="Loading video processor...";
+  await loadFFmpeg();
 
-  if(!ffmpeg){
-   const {createFFmpeg}=FFmpeg;
-   ffmpeg=createFFmpeg({
-    log:false,
-    corePath:"https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
-   });
-   await ffmpeg.load();
-  }
-
-  status.textContent="Preparing your video...";
+  status.textContent="Preparing video...";
 
   const ext=(file.name.split(".").pop()||"mp4")
    .toLowerCase().replace(/[^a-z0-9]/g,"");
+
   inputName="source."+ext;
 
   try{ffmpeg.FS("unlink",inputName);}catch(e){}
@@ -225,20 +436,18 @@ processBtn.addEventListener("click",async()=>{
   ffmpeg.FS("writeFile",inputName,
    new Uint8Array(await file.arrayBuffer()));
 
-  const count=Math.ceil(duration/seconds);
-
-  for(let i=0;i<count;i++){
-   const start=i*seconds;
-   const length=Math.min(seconds,duration-start);
-   const output="clip_"+(i+1)+".mp4";
+  for(let i=0;i<clips.length;i++){
+   const clip=clips[i];
+   const output=prefix+"_"+(i+1)+".mp4";
+   const length=clip.end-clip.start;
 
    try{ffmpeg.FS("unlink",output);}catch(e){}
 
-   status.textContent="Creating clip "+(i+1)+" of "+count+"...";
+   status.textContent="Creating clip "+(i+1)+" of "+clips.length+"...";
 
    const args=[
     "-y",
-    "-ss",String(start),
+    "-ss",String(clip.start),
     "-i",inputName,
     "-t",String(length)
    ];
@@ -272,24 +481,25 @@ processBtn.addEventListener("click",async()=>{
    link.href=url;
    link.download=output;
    link.className="download";
-   link.textContent="⬇ Download Clip "+(i+1);
-   downloads.appendChild(link);
+   link.textContent="⬇ Download "+prefix+" "+(i+1);
 
+   downloads.appendChild(link);
    ffmpeg.FS("unlink",output);
   }
 
-  status.textContent="Success! "+count+" clips created.";
+  status.textContent="Success! "+clips.length+" clips created.";
 
  }catch(error){
   console.error(error);
-  status.textContent="Processing failed. Details: "+error.message;
+  status.textContent="Processing failed: "+error.message;
  }finally{
   if(inputName&&ffmpeg){
    try{ffmpeg.FS("unlink",inputName);}catch(e){}
   }
-  processBtn.disabled=false;
+  buttons.forEach(button=>button.disabled=false);
  }
-});
+}
 </script>
+
 </body>
 </html>
