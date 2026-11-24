@@ -11,11 +11,11 @@
 body{margin:0;background:#090d18;color:white;font-family:Arial,sans-serif}
 header{padding:22px;background:#151c2d;border-bottom:1px solid #303b54}
 .logo{font-size:24px;font-weight:bold;color:#a48aff}
-.hero{text-align:center;padding:45px 15px}
-h1{font-size:34px}
+.hero{text-align:center;padding:35px 15px}
+h1{font-size:32px}
 .highlight{color:#a48aff}
 .container{max-width:700px;margin:15px auto;padding:22px;background:#151c2d;border:1px solid #303b54;border-radius:16px}
-.upload{display:block;text-align:center;padding:35px 12px;border:2px dashed #8170d9;border-radius:13px;cursor:pointer}
+.upload{display:block;text-align:center;padding:30px 12px;border:2px dashed #8170d9;border-radius:13px;cursor:pointer}
 input[type=file]{display:none}
 input[type=number],select{padding:12px;width:100%;background:#090d18;color:white;border:1px solid #53607c;border-radius:8px;margin-top:10px}
 button{padding:13px 18px;background:#8164ed;color:white;border:0;border-radius:8px;font-size:15px;cursor:pointer}
@@ -28,12 +28,11 @@ footer{text-align:center;padding:30px;color:#8490a8}
 </style>
 </head>
 <body>
-
 <header><div class="logo">✦ ClipGenius AI</div></header>
 
 <section class="hero">
 <h1>Turn Long Videos Into <span class="highlight">Short Clips</span></h1>
-<p class="info">Split videos into downloadable clips.</p>
+<p class="info">Create shorter videos with adjustable export quality.</p>
 </section>
 
 <div class="container">
@@ -41,7 +40,7 @@ footer{text-align:center;padding:30px;color:#8490a8}
 <label class="upload" for="videoFile">
 ⬆
 <h3>Choose your video</h3>
-<p class="info">Tap to select an MP4 or other supported video</p>
+<p class="info">Select an MP4 or other supported video</p>
 <button type="button">Select Video</button>
 </label>
 <input type="file" id="videoFile" accept="video/*">
@@ -55,15 +54,12 @@ footer{text-align:center;padding:30px;color:#8490a8}
 <input id="clipDuration" type="number" min="5" max="300" value="30">
 
 <h2>3. Choose video resolution</h2>
-<p class="info">Select the resolution for your exported clips.</p>
-
 <select id="resolution">
 <option value="original">Original Quality</option>
 <option value="480">480p</option>
 <option value="720">720p HD</option>
-<option value="1080">1080p Full HD</option>
+<option value="1080" selected>1080p Full HD</option>
 </select>
-
 <p class="info">Higher resolutions may take longer to process.</p>
 
 <button id="process" disabled>Generate Clips</button>
@@ -91,7 +87,6 @@ input.addEventListener("change",()=>{
  if(!file)return;
 
  if(videoURL)URL.revokeObjectURL(videoURL);
-
  videoURL=URL.createObjectURL(file);
  preview.src=videoURL;
  preview.hidden=false;
@@ -106,7 +101,7 @@ input.addEventListener("change",()=>{
 });
 
 processBtn.addEventListener("click",async()=>{
- if(!file || !duration)return;
+ if(!file||!duration)return;
 
  const seconds=Number(document.getElementById("clipDuration").value);
  const resolution=document.getElementById("resolution").value;
@@ -118,7 +113,6 @@ processBtn.addEventListener("click",async()=>{
 
  processBtn.disabled=true;
  downloads.innerHTML="";
-
  let inputName="";
 
  try{
@@ -137,7 +131,6 @@ processBtn.addEventListener("click",async()=>{
 
   const ext=(file.name.split(".").pop()||"mp4")
    .toLowerCase().replace(/[^a-z0-9]/g,"");
-
   inputName="source."+ext;
 
   try{ffmpeg.FS("unlink",inputName);}catch(e){}
@@ -154,8 +147,7 @@ processBtn.addEventListener("click",async()=>{
 
    try{ffmpeg.FS("unlink",output);}catch(e){}
 
-   status.textContent="Creating clip "+(i+1)+" of "+count+
-    " at "+resolution+"...";
+   status.textContent="Creating clip "+(i+1)+" of "+count+"...";
 
    const args=[
     "-y",
@@ -166,21 +158,19 @@ processBtn.addEventListener("click",async()=>{
 
    if(resolution!=="original"){
     const height=Number(resolution);
-
     const filter=preview.videoWidth>=preview.videoHeight
-     ? "scale=-2:"+height
-     : "scale="+height+":-2";
-
+     ?"scale=-2:"+height
+     :"scale="+height+":-2";
     args.push("-vf",filter);
    }
 
    args.push(
     "-c:v","libx264",
-    "-preset","fast",
+    "-preset","ultrafast",
     "-crf","20",
     "-pix_fmt","yuv420p",
     "-c:a","aac",
-    "-b:a","192k",
+    "-b:a","128k",
     "-movflags","+faststart",
     output
    );
@@ -201,15 +191,13 @@ processBtn.addEventListener("click",async()=>{
    ffmpeg.FS("unlink",output);
   }
 
-  status.textContent="Success! "+count+
-   " clips created at "+resolution+" resolution.";
+  status.textContent="Success! "+count+" clips created.";
 
  }catch(error){
   console.error(error);
-  status.textContent="Processing failed. Try a smaller video. Details: "+
-   error.message;
+  status.textContent="Processing failed. Details: "+error.message;
  }finally{
-  if(inputName && ffmpeg){
+  if(inputName&&ffmpeg){
    try{ffmpeg.FS("unlink",inputName);}catch(e){}
   }
   processBtn.disabled=false;
