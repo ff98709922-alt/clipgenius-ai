@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#090d19">
 <title>ClipGenius AI</title>
+
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 
 <style>
@@ -46,6 +47,9 @@ video{width:100%;margin-top:17px;border-radius:12px;background:#05070d}
 progress{width:100%;height:12px;accent-color:#a58aff}
 .progress-label{font-size:12px;color:#b9a9ee;margin-top:7px}
 .small{font-size:11px;color:#8894ae}
+.field{margin-top:18px}
+.field label{display:block;color:#a2abc2;font-size:13px;margin-bottom:6px}
+#subtitleInfo{font-size:12px;color:#a5b0ca;margin-top:8px}
 footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 @media(max-width:600px){
  header{padding:17px 5%}
@@ -54,11 +58,12 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 }
 </style>
 </head>
+
 <body>
 
 <header>
  <div class="logo">✦ ClipGenius <span>AI</span></div>
- <div class="navtag">CREATOR STUDIO</div>
+ <div class="navtag">CREATOR STUDIO · V2</div>
 </header>
 
 <section class="hero">
@@ -70,12 +75,14 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 <div class="container">
  <div class="step">STEP 01</div>
  <h2>Upload your video</h2>
+
  <label class="upload" for="videoFile">
   <div class="upload-icon">⬆</div>
   <h3>Choose your video</h3>
   <p class="info">Select a video from your device</p>
   <button type="button">Select Video</button>
  </label>
+
  <input type="file" id="videoFile" accept="video/*">
  <video id="preview" controls hidden></video>
  <p id="details" class="info"></p>
@@ -84,7 +91,8 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
 <div class="container">
  <div class="step">STEP 02</div>
  <h2>✦ Smart Clip Detection</h2>
- <p class="info">Find possible highlights by analysing visual changes between video scenes. No paid API required.</p>
+ <p class="info">Analyse visual changes between scenes and find possible highlight moments.</p>
+
  <button id="detectBtn" class="primary" disabled>✦ Find Highlights</button>
  <div id="detectStatus">Upload a video to start detection.</div>
  <div id="suggestions"></div>
@@ -94,24 +102,49 @@ footer{text-align:center;padding:30px 12px;color:#79849c;font-size:12px}
  <div class="step">STEP 03</div>
  <h2>Manual Clip Settings</h2>
  <p class="info">Choose how long each clip should be.</p>
+
  <input id="clipDuration" type="number" min="5" max="300" value="30">
 
- <h2 style="margin-top:22px">Export Resolution</h2>
- <select id="resolution">
-  <option value="original">Original Resolution</option>
-  <option value="480">480p</option>
-  <option value="720">720p HD</option>
-  <option value="1080" selected>1080p Full HD</option>
- </select>
- <p class="info">Higher resolutions require more processing. Original Resolution avoids resizing.</p>
+ <div class="field">
+  <label>Export Resolution</label>
+  <select id="resolution">
+   <option value="480">480p</option>
+   <option value="720">720p HD</option>
+   <option value="1080" selected>1080p Full HD</option>
+   <option value="original">Original Resolution</option>
+  </select>
+ </div>
+
+ <div class="field">
+  <label>Video Format</label>
+  <select id="aspect">
+   <option value="original">Original Aspect Ratio</option>
+   <option value="portrait">9:16 Vertical · Shorts/Reels</option>
+   <option value="landscape">16:9 Landscape</option>
+   <option value="square">1:1 Square</option>
+  </select>
+ </div>
+
+ <div class="field">
+  <label>Optional SRT subtitle file</label>
+  <label class="upload" for="subtitleFile">
+   <div class="upload-icon">📝</div>
+   <h3>Select subtitle file</h3>
+   <p class="info">Upload an existing .srt file</p>
+  </label>
+  <input type="file" id="subtitleFile" accept=".srt">
+  <p id="subtitleInfo">No subtitle file selected.</p>
+ </div>
 
  <button id="process" class="primary" disabled>Generate Manual Clips</button>
+
  <div id="status">Upload a video to get started.</div>
 
  <div class="progress-wrap" id="progressWrap">
   <progress id="exportProgress" max="100" value="0"></progress>
   <div class="progress-label" id="progressLabel">Preparing export...</div>
  </div>
+
  <div id="downloads"></div>
 </div>
 
@@ -130,6 +163,7 @@ const suggestions=document.getElementById("suggestions");
 const progressWrap=document.getElementById("progressWrap");
 const exportProgress=document.getElementById("exportProgress");
 const progressLabel=document.getElementById("progressLabel");
+const subtitleInput=document.getElementById("subtitleFile");
 
 let file=null;
 let duration=0;
@@ -137,8 +171,7 @@ let videoURL=null;
 let ffmpeg=null;
 let detectedClips=[];
 let exporting=false;
-let currentClipIndex=0;
-let totalClips=0;
+let subtitleText="";
 
 function getClipDuration(){
  const value=Number(document.getElementById("clipDuration").value);
@@ -149,10 +182,13 @@ function getClipDuration(){
 }
 
 input.addEventListener("change",()=>{
- file=input.files[0];
- if(!file)return;
+ const selected=input.files[0];
+ if(!selected)return;
+
+ file=selected;
 
  if(videoURL)URL.revokeObjectURL(videoURL);
+
  videoURL=URL.createObjectURL(file);
  preview.src=videoURL;
  preview.hidden=false;
@@ -160,18 +196,46 @@ input.addEventListener("change",()=>{
  detectedClips=[];
  suggestions.innerHTML="";
  downloads.innerHTML="";
+
  details.textContent="Loading video information...";
  detectStatus.textContent="Ready for scene detection.";
  status.textContent="Video uploaded. Ready to process.";
 
+ processBtn.disabled=true;
+ detectBtn.disabled=true;
+
  preview.onloadedmetadata=()=>{
   duration=preview.duration;
-  details.textContent="Selected: "+file.name+
+
+  details.textContent=
+   "Selected: "+file.name+
    " | Duration: "+Math.floor(duration)+" seconds"+
    " | Resolution: "+preview.videoWidth+"x"+preview.videoHeight;
+
   processBtn.disabled=false;
   detectBtn.disabled=false;
  };
+});
+
+subtitleInput.addEventListener("change",async()=>{
+ const selected=subtitleInput.files[0];
+
+ if(!selected){
+  subtitleText="";
+  return;
+ }
+
+ if(!selected.name.toLowerCase().endsWith(".srt")){
+  subtitleText="";
+  document.getElementById("subtitleInfo").textContent=
+   "Please select an SRT file.";
+  return;
+ }
+
+ subtitleText=await selected.text();
+
+ document.getElementById("subtitleInfo").textContent=
+  "Selected: "+selected.name+" · Subtitle file ready.";
 });
 
 function seekVideo(time){
@@ -201,37 +265,43 @@ function seekVideo(time){
  });
 }
 
-async function getFrame(time,canvas,context){
- await seekVideo(time);
- context.drawImage(preview,0,0,canvas.width,canvas.height);
- return context.getImageData(0,0,canvas.width,canvas.height).data;
-}
-
 function compareFrames(a,b){
  let difference=0;
  let samples=0;
+
  for(let i=0;i<a.length;i+=16){
   difference+=Math.abs(a[i]-b[i]);
   difference+=Math.abs(a[i+1]-b[i+1]);
   difference+=Math.abs(a[i+2]-b[i+2]);
   samples+=3;
  }
+
  return difference/(samples||1);
 }
 
+async function getFrame(time,canvas,context){
+ await seekVideo(time);
+ context.drawImage(preview,0,0,canvas.width,canvas.height);
+ return context.getImageData(0,0,canvas.width,canvas.height).data;
+}
+
 detectBtn.addEventListener("click",async()=>{
- if(!file||!duration)return;
+ if(!file||!duration||exporting)return;
+
  detectBtn.disabled=true;
  suggestions.innerHTML="";
  detectedClips=[];
 
  try{
   detectStatus.textContent="Analysing video scenes...";
+
   const canvas=document.createElement("canvas");
   canvas.width=96;
   canvas.height=54;
+
   const context=canvas.getContext("2d",{willReadFrequently:true});
-  const step=Math.max(1.5,duration/150);
+
+  const step=Math.max(1.5,duration/120);
   let previous=null;
   let changes=[];
   const total=Math.floor(duration/step);
@@ -242,16 +312,20 @@ detectBtn.addEventListener("click",async()=>{
 
    if(previous){
     const score=compareFrames(previous,current);
+
     if(score>22&&time>2&&time<duration-2){
      changes.push({time,score});
     }
    }
+
    previous=current;
+
    detectStatus.textContent="Analysing scenes: "+
     Math.min(100,Math.round((i+1)/(total+1)*100))+"%";
   }
 
   changes.sort((a,b)=>b.score-a.score);
+
   const clipLength=getClipDuration();
   const selected=[];
 
@@ -260,18 +334,27 @@ detectBtn.addEventListener("click",async()=>{
     duration-clipLength,
     change.time-clipLength*0.35
    ));
+
    const end=Math.min(duration,start+clipLength);
+
    if(end<=start)continue;
 
-   const overlaps=selected.some(item=>start<item.end&&end>item.start);
-   if(!overlaps)selected.push({start,end,score:change.score});
+   const overlaps=selected.some(item=>
+    start<item.end&&end>item.start
+   );
+
+   if(!overlaps)selected.push({
+    start,end,score:change.score
+   });
+
    if(selected.length>=8)break;
   }
 
   detectedClips=selected.sort((a,b)=>a.start-b.start);
 
   if(!detectedClips.length){
-   detectStatus.textContent="No strong scene changes found. Try another video or use manual clipping.";
+   detectStatus.textContent=
+    "No strong scene changes found. Try another video or manual clipping.";
    return;
   }
 
@@ -281,17 +364,23 @@ detectBtn.addEventListener("click",async()=>{
   detectedClips.forEach((clip,index)=>{
    const item=document.createElement("div");
    item.className="suggestion";
+
    const label=document.createElement("label");
    const checkbox=document.createElement("input");
+
    checkbox.type="checkbox";
    checkbox.checked=true;
    checkbox.dataset.index=index;
+
    const text=document.createElement("div");
    const title=document.createElement("strong");
    title.textContent="Suggested Highlight "+(index+1);
+
    const time=document.createElement("p");
    time.className="info";
-   time.textContent="Start: "+clip.start.toFixed(1)+"s · End: "+clip.end.toFixed(1)+"s";
+   time.textContent="Start: "+clip.start.toFixed(1)+
+    "s · End: "+clip.end.toFixed(1)+"s";
+
    text.append(title,time);
    label.append(checkbox,text);
    item.append(label);
@@ -301,7 +390,23 @@ detectBtn.addEventListener("click",async()=>{
   const exportButton=document.createElement("button");
   exportButton.className="primary";
   exportButton.textContent="Export Selected Highlights";
-  exportButton.addEventListener("click",exportHighlights);
+
+  exportButton.addEventListener("click",async()=>{
+   const checked=[
+    ...suggestions.querySelectorAll('input[type="checkbox"]:checked')
+   ];
+
+   if(!checked.length){
+    detectStatus.textContent="Select at least one highlight.";
+    return;
+   }
+
+   await createExports(
+    checked.map(item=>detectedClips[Number(item.dataset.index)]),
+    "highlight"
+   );
+  });
+
   suggestions.appendChild(exportButton);
 
  }catch(error){
@@ -312,148 +417,330 @@ detectBtn.addEventListener("click",async()=>{
 });
 
 async function loadFFmpeg(){
- if(ffmpeg)return;
- status.textContent="Loading video processor...";
- const {createFFmpeg}=FFmpeg;
+ if(ffmpeg&&ffmpeg.isLoaded())return;
+
+ if(!window.FFmpeg||!window.FFmpeg.createFFmpeg){
+  throw new Error("FFmpeg library failed to load. Check your internet connection.");
+ }
+
+ const {createFFmpeg}=window.FFmpeg;
+
  ffmpeg=createFFmpeg({
   log:false,
   corePath:"https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
  });
+
+ ffmpeg.setProgress(({ratio})=>{
+  if(Number.isFinite(ratio)){
+   progressLabel.textContent=
+    "Encoding video: "+Math.round(ratio*100)+"%";
+  }
+ });
+
  await ffmpeg.load();
 }
 
-async function exportHighlights(){
- const checked=[...suggestions.querySelectorAll('input[type="checkbox"]:checked')];
- if(!checked.length){
-  detectStatus.textContent="Select at least one highlight.";
-  return;
+function makeFilter(resolution,aspect){
+ if(aspect==="original"&&resolution==="original")return null;
+
+ let width,height;
+
+ if(resolution==="original"){
+  width=preview.videoWidth;
+  height=preview.videoHeight;
+ }else{
+  const size=Number(resolution);
+
+  if(aspect==="portrait"){
+   width=Math.round(size*9/16);
+   height=size;
+  }else if(aspect==="square"){
+   width=size;
+   height=size;
+  }else if(aspect==="landscape"){
+   width=Math.round(size*16/9);
+   height=size;
+  }else{
+   const ratio=preview.videoWidth/preview.videoHeight;
+
+   if(ratio>=1){
+    height=size;
+    width=Math.round(size*ratio);
+   }else{
+    width=size;
+    height=Math.round(size/ratio);
+   }
+  }
  }
- await createExports(checked.map(item=>detectedClips[Number(item.dataset.index)]),"highlight");
+
+ width=Math.max(2,Math.floor(width/2)*2);
+ height=Math.max(2,Math.floor(height/2)*2);
+
+ if(aspect==="original"){
+  return "scale="+width+":"+height+
+   ":force_original_aspect_ratio=decrease:flags=fast_bilinear";
+ }
+
+ return "scale="+width+":"+height+
+  ":force_original_aspect_ratio=increase:flags=fast_bilinear"+
+  ",crop="+width+":"+height;
 }
 
-processBtn.addEventListener("click",async()=>{
- if(!file||!duration)return;
- try{
-  const seconds=getClipDuration();
-  const clips=[];
-  for(let i=0;i<Math.ceil(duration/seconds);i++){
-   clips.push({start:i*seconds,end:Math.min((i+1)*seconds,duration)});
-  }
-  await createExports(clips,"manual");
- }catch(error){
-  status.textContent=error.message;
+function srtTimeToSeconds(value){
+ const match=value.trim().match(
+  /(\d+):(\d+):(\d+)[,.](\d+)/
+ );
+
+ if(!match)return null;
+
+ return Number(match[1])*3600+
+  Number(match[2])*60+
+  Number(match[3])+
+  Number("0."+match[4]);
+}
+
+function secondsToSrt(seconds){
+ const ms=Math.max(0,Math.round(seconds*1000));
+ const hours=Math.floor(ms/3600000);
+ const minutes=Math.floor((ms%3600000)/60000);
+ const secs=Math.floor((ms%60000)/1000);
+ const millis=ms%1000;
+
+ return String(hours).padStart(2,"0")+":"+
+  String(minutes).padStart(2,"0")+":"+
+  String(secs).padStart(2,"0")+","+
+  String(millis).padStart(3,"0");
+}
+
+function makeClipSrt(source,start,end){
+ if(!source.trim())return "";
+
+ const blocks=source.replace(/\r/g,"").trim().split(/\n\s*\n/);
+ const output=[];
+
+ for(const block of blocks){
+  const lines=block.split("\n");
+  const timingIndex=lines.findIndex(line=>line.includes("-->"));
+
+  if(timingIndex<0)continue;
+
+  const times=lines[timingIndex].split("-->");
+  const cueStart=srtTimeToSeconds(times[0]);
+  const cueEnd=srtTimeToSeconds(times[1]);
+
+  if(cueStart===null||cueEnd===null)continue;
+
+  const clippedStart=Math.max(start,cueStart);
+  const clippedEnd=Math.min(end,cueEnd);
+
+  if(clippedEnd<=clippedStart)continue;
+
+  const text=lines.slice(timingIndex+1).join("\n");
+
+  output.push({
+   start:clippedStart-start,
+   end:clippedEnd-start,
+   text
+  });
  }
-});
+
+ return output.map((cue,index)=>
+  (index+1)+"\n"+
+  secondsToSrt(cue.start)+" --> "+
+  secondsToSrt(cue.end)+"\n"+
+  cue.text
+ ).join("\n\n");
+}
+
+function addDownload(blob,name,label){
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");
+
+ link.href=url;
+ link.download=name;
+ link.className="download";
+ link.textContent=label;
+
+ downloads.appendChild(link);
+}
 
 async function createExports(clips,prefix){
  if(!file||!clips.length||exporting)return;
 
  exporting=true;
- const resolution=document.getElementById("resolution").value;
+
  const buttons=[processBtn,detectBtn];
  buttons.forEach(button=>button.disabled=true);
+
+ suggestions.querySelectorAll("button").forEach(button=>{
+  button.disabled=true;
+ });
+
  downloads.innerHTML="";
  progressWrap.style.display="block";
  exportProgress.value=0;
- currentClipIndex=0;
- totalClips=clips.length;
 
  let inputName="";
+ let outputName="";
 
  try{
   await loadFFmpeg();
-  status.textContent="Preparing video...";
+
+  status.textContent="Preparing video processor...";
 
   const ext=(file.name.split(".").pop()||"mp4")
    .toLowerCase().replace(/[^a-z0-9]/g,"");
+
   inputName="source."+ext;
 
   try{ffmpeg.FS("unlink",inputName);}catch(e){}
-  ffmpeg.FS("writeFile",inputName,new Uint8Array(await file.arrayBuffer()));
+
+  ffmpeg.FS(
+   "writeFile",
+   inputName,
+   new Uint8Array(await file.arrayBuffer())
+  );
 
   for(let i=0;i<clips.length;i++){
-   currentClipIndex=i;
    const clip=clips[i];
-   const output=prefix+"_"+(i+1)+".mp4";
    const length=clip.end-clip.start;
 
-   try{ffmpeg.FS("unlink",output);}catch(e){}
+   if(length<=0)continue;
 
-   status.textContent="Creating clip "+(i+1)+" of "+clips.length+"...";
-   progressLabel.textContent="Clip "+(i+1)+" of "+clips.length+" · Starting...";
+   outputName=prefix+"_"+(i+1)+".mp4";
+
+   try{ffmpeg.FS("unlink",outputName);}catch(e){}
+
+   status.textContent=
+    "Creating clip "+(i+1)+" of "+clips.length+"...";
+
+   progressLabel.textContent=
+    "Starting clip "+(i+1)+" of "+clips.length;
 
    const args=[
     "-y",
     "-ss",String(clip.start),
     "-i",inputName,
-    "-t",String(length)
+    "-t",String(length),
+    "-map","0:v:0",
+    "-map","0:a?",
+    "-sn"
    ];
 
-   if(resolution!=="original"){
-    const height=Number(resolution);
-    const landscape=preview.videoWidth>=preview.videoHeight;
+   const filter=makeFilter(
+    document.getElementById("resolution").value,
+    document.getElementById("aspect").value
+   );
 
-    const maxWidth=landscape?height*2:height;
-    const maxHeight=landscape?height:height*2;
-
-    const filter=
-     "scale=w='min(iw,"+maxWidth+")':h='min(ih,"+maxHeight+")'"+
-     ":force_original_aspect_ratio=decrease:force_divisible_by=2:flags=fast_bilinear";
-
-    args.push("-vf",filter);
-   }
+   if(filter)args.push("-vf",filter);
 
    args.push(
     "-c:v","libx264",
     "-preset","ultrafast",
-    "-crf","20",
+    "-crf","23",
     "-pix_fmt","yuv420p",
     "-c:a","aac",
     "-b:a","128k",
     "-movflags","+faststart",
-    output
+    "-threads","2",
+    outputName
    );
 
    ffmpeg.setProgress(({ratio})=>{
     if(!Number.isFinite(ratio))return;
-    const clipPercent=Math.max(0,Math.min(100,ratio*100));
-    const overall=((i+clipPercent/100)/clips.length)*100;
+
+    const percentage=Math.max(0,Math.min(100,ratio*100));
+    const overall=((i+percentage/100)/clips.length)*100;
+
     exportProgress.value=overall;
-    progressLabel.textContent="Exporting: "+Math.round(overall)+"% · Clip "+(i+1)+" of "+clips.length;
+
+    progressLabel.textContent=
+     "Exporting "+Math.round(overall)+"% · Clip "+
+     (i+1)+" of "+clips.length;
    });
 
    await ffmpeg.run(...args);
 
-   const data=ffmpeg.FS("readFile",output);
+   const data=ffmpeg.FS("readFile",outputName);
    const blob=new Blob([data],{type:"video/mp4"});
-   const url=URL.createObjectURL(blob);
 
-   const link=document.createElement("a");
-   link.href=url;
-   link.download=output;
-   link.className="download";
-   link.textContent="⬇ Download "+prefix+" "+(i+1);
-   downloads.appendChild(link);
+   addDownload(
+    blob,
+    prefix+"_"+(i+1)+".mp4",
+    "⬇ Download "+prefix+" "+(i+1)
+   );
 
-   ffmpeg.FS("unlink",output);
+   if(subtitleText){
+    const srt=makeClipSrt(subtitleText,clip.start,clip.end);
+
+    if(srt){
+     addDownload(
+      new Blob([srt],{type:"text/plain;charset=utf-8"}),
+      prefix+"_"+(i+1)+".srt",
+      "📝 Download subtitles "+(i+1)
+     );
+    }
+   }
+
+   ffmpeg.FS("unlink",outputName);
+   outputName="";
+
    exportProgress.value=((i+1)/clips.length)*100;
   }
 
-  status.textContent="Success! "+clips.length+" clips created.";
+  status.textContent="Success! Your clips are ready to download.";
   progressLabel.textContent="Export complete · 100%";
 
  }catch(error){
   console.error(error);
-  status.textContent="Processing failed: "+error.message;
-  progressLabel.textContent="Export stopped. Please try again.";
+
+  status.textContent=
+   "Processing failed: "+error.message+
+   " · Try a smaller video or lower resolution.";
+
+  progressLabel.textContent="Export stopped.";
  }finally{
-  if(inputName&&ffmpeg){
-   try{ffmpeg.FS("unlink",inputName);}catch(e){}
+  if(ffmpeg){
+   if(inputName){
+    try{ffmpeg.FS("unlink",inputName);}catch(e){}
+   }
+
+   if(outputName){
+    try{ffmpeg.FS("unlink",outputName);}catch(e){}
+   }
   }
+
   buttons.forEach(button=>button.disabled=false);
+
+  suggestions.querySelectorAll("button").forEach(button=>{
+   button.disabled=false;
+  });
+
   exporting=false;
  }
 }
+
+processBtn.addEventListener("click",async()=>{
+ if(!file||!duration||exporting)return;
+
+ try{
+  const seconds=getClipDuration();
+
+  const clips=[];
+
+  for(let i=0;i<Math.ceil(duration/seconds);i++){
+   clips.push({
+    start:i*seconds,
+    end:Math.min((i+1)*seconds,duration)
+   });
+  }
+
+  await createExports(clips,"manual");
+
+ }catch(error){
+  status.textContent=error.message;
+ }
+});
 </script>
 </body>
 </html>
